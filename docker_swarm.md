@@ -100,3 +100,10 @@
         portainer/portainer \
         -H unix:///var/run/docker.sock
     ```
+    
+
+
+
+
+参考
+> https://blog.51cto.com/lookingdream/2060292
