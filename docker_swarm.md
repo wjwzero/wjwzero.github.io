@@ -7,6 +7,10 @@
         127.0.0.1   localhost
         xxx.xxx.xxx.xx  node01
         xxx.xxx.xxx.xx  node02
+        // 修改hostname
+        # hostname set-hostname node1
+        // 查看hostname
+        # hostname
     ```
 2. 配置SSH免密登录
     ```
@@ -21,7 +25,7 @@
         [node]
         192.168.139.176
         192.168.139.177
-        # sed -i "s/SELINUX=enforcing/SELINUX=disabled" /etc/selinux/config
+        # sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
         # ansible node -m copy -a 'src=/etc/selinux/config dest=/etc/selinux/'
         # systemctl stop firewalld
         # systemctl disable firewalld
@@ -37,7 +41,20 @@
         # yum list docker-ce --showduplicates | sort -r
         # yum -y install docker-ce
     ```
-5. 使用ansible在worker节点安装docker
+5. 开启 DOCKER HTTP API
+    ```
+        # vi /lib/systemd/system/docker.service
+        ////
+        [Service]
+        #下添加以下两行
+        ExecStart=
+        ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock
+        ////
+        
+        # ansible node -m command -a  'systemctl daemon-reload'
+        # ansible node -m command -a  'systemctl restart docker.service'
+    ```    
+6. 使用ansible在worker节点安装docker
     ```
         # ansible node -m copy -a 'src=/etc/yum.repos.d/docker-ce.repo dest=/etc/yum.repos.d/'
         # ansible node -m yum -a "state=present name=docker-ce"
@@ -49,15 +66,6 @@
         # ansible node -a 'systemctl start docker'
         # ansible node -a 'systemctl status docker'
         # ansible node -a 'systemctl enable docker'
-    ```
-6. 开启 DOCKER HTTP API
-    ```
-        # vi /lib/systemd/system/docker.service
-        ////
-        [Service]
-        #下添加以下两行
-        ExecStart=
-        ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock
     ```
 7. 启动docker 配置开机启动
     ```
