@@ -97,6 +97,11 @@
     ```
         # docker network ls
     ```
+6. 创建网络
+   ```
+       # docker network create -d overlay --attachable xxxx  
+       // --attachable 其他独立容器可与此网络通信
+   ```    
 ## 安装Portainer
 1. docker 安装Portainer
     ```
