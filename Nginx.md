@@ -3,8 +3,8 @@
     real_ip_header  X-Forwarded-For;
 
 ## nginx 黑白名单
-    allow 白
-    deny  黑
+    allow  //白
+    deny   //黑
 ## 阿里云nginx websocket配置
 
     http块加入:
