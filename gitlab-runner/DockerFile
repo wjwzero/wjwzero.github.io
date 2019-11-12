@@ -1,0 +1,43 @@
+from centos
+
+#add java
+
+volume /data
+
+
+ENV JAVA_HOME "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.201.b09-2.el7_6.x86_64/"
+
+run ln -s /root/apache-maven-3.5.3/bin/mvn /bin/mvn
+from centos
+
+#add java
+
+volume /data
+
+
+ENV JAVA_HOME "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.201.b09-2.el7_6.x86_64/"
+
+run ln -s /root/apache-maven-3.5.3/bin/mvn /bin/mvn
+
+run yum install -y yum-utils && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && yum  install -y  docker-ce-cli
+
+add daemon.json /etc/docker/daemon.json
+
+run curl -OL https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh && bash script.rpm.sh && rm script.rpm.sh
+
+run yum install -y gitlab-runner
+
+add config.toml /etc/gitlab-runner/config.toml
+
+run curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
+add Dockerfile-new.conf /opt/Dockerfile
+add docker-compose.yml.conf /opt/docker-compose.yml
+
+env URL "http://172.16.80.138:3000/"
+env TOKEN "-C7a5byJXftGWzC88_1t"
+env EXECUTOR "shell"
+env TAG_LIST "java,maven,docker"
+env DESC "multirunner contains java,maven,docker env"
+
+
+ENTRYPOINT   echo -e "\n\n\n\n\n\n" | gitlab-ci-multi-runner register -u ${URL} -r ${TOKEN} --tag-list ${TAG_LIST} --executor ${EXECUTOR} --shell bash --name ${DESC}  &&   gitlab-ci-multi-runner run
