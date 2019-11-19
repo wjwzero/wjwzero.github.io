@@ -115,9 +115,35 @@
         -H unix:///var/run/docker.sock
     ```
     
-
-
-
-
 参考
 > https://blog.51cto.com/lookingdream/2060292
+
+---
+## 部署步骤
+
+1. 挂载NAS 
+    > NAS
+2. 添加标签
+    ```
+        docker node update --label-add role=manager [nodeName]  //用于安装 portainer
+        docker node update --label-add node=[nodeName] [nodeName]
+    ``` 
+3. 安装 portainer
+    ```
+        docker service create \
+        --name portainer \
+        --publish 9000:9000 \
+        --replicas=1 \
+        --constraint 'node.role == manager' \
+        --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
+        --mount type=bind,src=/mnt/acs_mnt/nas/data/portainer,dst=/data \
+        portainer/portainer \
+        -H unix:///var/run/docker.sock
+    ```
+3. 创建网络 docker network create -d overlay --attachable itms-chn
+4. 部署数据源  
+注 ES vm： 
+
+    在   /etc/sysctl.conf文件最后添加一行
+    vm.max_map_count=262144
+    sysctl 立即生效 /sbin/sysctl -p
