@@ -1,0 +1,1 @@
+> docker run -d -p 2181:2181 -v /mnt/acs_mnt/nas/data/deploy/chn/data_source_chn/zookeeper/data:/data --name=zookeeper_chn --privileged zookeeper
