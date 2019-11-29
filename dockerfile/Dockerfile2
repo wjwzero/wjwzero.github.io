@@ -1,0 +1,11 @@
+#VERSION EE:latest
+FROM java:8
+MAINTAINER wangjianwei "wangjianwei@jimi360.cn"
+VOLUME /tmp
+RUN mkdir -p /usr/local/cron
+COPY osp-core-web /usr/local/cron
+WORKDIR /usr/local/cron/
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -f http://127.0.0.1:${HCPORT}/actuator/health || exit 1
+RUN chmod +x *.sh
+RUN which bash
+CMD ["bash", "/usr/local/cron/start.sh"]

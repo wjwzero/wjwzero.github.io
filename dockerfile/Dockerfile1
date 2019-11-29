@@ -1,0 +1,34 @@
+FROM java:8
+MAINTAINER wangchao "wangchao@jimi360.cn"
+
+#HEALTHCHECK --interval=<healthcheck_interval> --timeout=<healthcheck_timeout> --retries=<healthcheck_retries> CMD curl -f 127.0.0.1:<healthcheck_port>/actuator/health || exit 1
+
+ENV PROFILE_ACTIVE "dev"
+ENV SUFFIX "other"
+ENV NET_SCOPE "^10\.0"
+
+#arg HEALTHCHECK_INTERVAL 30s
+#arg HEALTHCHECK_TIMEOUT 5s
+#arg HEALTHCHECK_RETRYIES 3
+arg hc_port
+env HCPORT ${hc_port}
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -f http://127.0.0.1:${HCPORT}/actuator/health || exit 1
+
+ARG jarname
+
+VOLUME /tmp
+
+RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo 'Asia/Shanghai' >/etc/timezone
+run echo "jarname-${jarname}"
+ADD ${jarname} /usr/local/${jarname}
+
+
+
+ENV JAR_NAME ${jarname}
+ENV JAVA_OPTIONS      "-Xms1g -Xmx1g -Xmn512m"
+ENV JAVA_OPTIONS_EXT  "-server -XX:+UseG1GC"
+ENV SPRING_EXT ""
+
+ENTRYPOINT java ${JAVA_OPTIONS}  ${JAVA_OPTIONS_EXT} -Dspring.cloud.inetutils.preferred-networks=${NET_SCOPE} -Djava.security.egd=file:/dev/./urandom -jar /usr/local/${JAR_NAME} --spring.profiles.active=${PROFILE_ACTIVE} $SPRING_EXT #--spring.suffix=${SUFFIX}
+
